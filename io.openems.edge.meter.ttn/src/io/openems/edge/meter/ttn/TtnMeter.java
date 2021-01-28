@@ -1,6 +1,5 @@
 package io.openems.edge.meter.ttn;
 
-import java.math.BigInteger;
 import java.util.Base64;
 
 import org.eclipse.paho.client.mqttv3.IMqttMessageListener;
@@ -19,17 +18,14 @@ import org.osgi.service.event.EventConstants;
 import org.osgi.service.event.EventHandler;
 import org.osgi.service.metatype.annotations.Designate;
 
-import com.google.common.io.BaseEncoding;
 import com.google.gson.Gson;
 
-import io.openems.edge.common.channel.ChannelId;
 import io.openems.edge.common.channel.Doc;
 import io.openems.edge.common.component.AbstractOpenemsComponent;
 import io.openems.edge.common.component.OpenemsComponent;
 import io.openems.edge.common.event.EdgeEventConstants;
 import io.openems.edge.meter.api.MeterType;
 import io.openems.edge.meter.api.SymmetricMeter;
-import io.openems.edge.thermometer.api.Thermometer;
 
 @Designate(ocd = Config.class, factory = true)
 @Component(//
@@ -63,8 +59,8 @@ public class TtnMeter extends AbstractOpenemsComponent implements OpenemsCompone
 	public TtnMeter() {
 		super(//
 				OpenemsComponent.ChannelId.values(), //
-				SymmetricMeter.ChannelId.values(), ChannelId.values() // ,
-				, Thermometer.ChannelId.values());
+				SymmetricMeter.ChannelId.values(), //
+				ChannelId.values());
 	}
 
 	@Activate
