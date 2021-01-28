@@ -1,5 +1,6 @@
 package io.openems.edge.meter.ttn;
 
+import java.math.BigInteger;
 import java.util.Base64;
 
 import org.eclipse.paho.client.mqttv3.IMqttMessageListener;
@@ -18,6 +19,7 @@ import org.osgi.service.event.EventConstants;
 import org.osgi.service.event.EventHandler;
 import org.osgi.service.metatype.annotations.Designate;
 
+import com.google.common.io.BaseEncoding;
 import com.google.gson.Gson;
 
 import io.openems.edge.common.channel.ChannelId;
@@ -27,6 +29,7 @@ import io.openems.edge.common.component.OpenemsComponent;
 import io.openems.edge.common.event.EdgeEventConstants;
 import io.openems.edge.meter.api.MeterType;
 import io.openems.edge.meter.api.SymmetricMeter;
+import io.openems.edge.thermometer.api.Thermometer;
 
 @Designate(ocd = Config.class, factory = true)
 @Component(//
@@ -34,8 +37,7 @@ import io.openems.edge.meter.api.SymmetricMeter;
 		immediate = true, //
 		configurationPolicy = ConfigurationPolicy.REQUIRE, //
 		property = { //
-				EventConstants.EVENT_TOPIC + "=" + EdgeEventConstants.TOPIC_CYCLE_BEFORE_PROCESS_IMAGE //
-		}//
+				EventConstants.EVENT_TOPIC + "=" + EdgeEventConstants.TOPIC_CYCLE_BEFORE_PROCESS_IMAGE }//
 )
 public class TtnMeter extends AbstractOpenemsComponent implements OpenemsComponent, EventHandler, SymmetricMeter {
 
@@ -61,8 +63,8 @@ public class TtnMeter extends AbstractOpenemsComponent implements OpenemsCompone
 	public TtnMeter() {
 		super(//
 				OpenemsComponent.ChannelId.values(), //
-				SymmetricMeter.ChannelId.values(), ChannelId.values() //
-		);
+				SymmetricMeter.ChannelId.values(), ChannelId.values() // ,
+				, Thermometer.ChannelId.values());
 	}
 
 	@Activate
@@ -82,14 +84,26 @@ public class TtnMeter extends AbstractOpenemsComponent implements OpenemsCompone
 			connOpts.setCleanSession(true);
 			ttnClient.connect(connOpts);
 
-			ttnClient.subscribe("+/devices/+/up", new IMqttMessageListener() {
+			ttnClient.subscribe("+/devices/" + config.deviceId() + "/up", new IMqttMessageListener() {
 				@Override
 				public void messageArrived(String topic, MqttMessage message) throws Exception {
-					String value = new String(message.getPayload());
-					TtnMessage parsedMessage = new Gson().fromJson(value, TtnMessage.class);
+					try {
+						String value = new String(message.getPayload());
+						TtnMessage parsedMessage = new Gson().fromJson(value, TtnMessage.class);
+						byte[] decoded = Base64.getDecoder().decode(parsedMessage.getPayload_raw());
 
-					String actualPayload = new String(Base64.getDecoder().decode(parsedMessage.getPayload_raw()));
-					currentValue = Integer.parseInt(actualPayload);
+						StringBuffer buffer = new StringBuffer();
+
+						for (int i = 0; i < decoded.length; i++) {
+							byte beit = decoded[i];
+							String string = Integer.toHexString(Byte.toUnsignedInt(beit));
+							buffer.append(string);
+						}
+
+						currentValue = Integer.parseInt(buffer.toString(), 16);
+					} catch (Exception e) {
+						e.printStackTrace();
+					}
 				}
 			});
 		} catch (MqttException e) {
@@ -122,7 +136,7 @@ public class TtnMeter extends AbstractOpenemsComponent implements OpenemsCompone
 
 	@Override
 	public String debugLog() {
-		return "Test Debug Log";
+		return null;
 	}
 
 	@Override

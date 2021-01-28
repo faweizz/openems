@@ -25,6 +25,7 @@ import io.openems.edge.common.component.AbstractOpenemsComponent;
 import io.openems.edge.common.component.OpenemsComponent;
 import io.openems.edge.common.event.EdgeEventConstants;
 import io.openems.edge.common.type.TypeUtils;
+import io.openems.edge.ess.api.AsymmetricEss;
 import io.openems.edge.ess.api.ManagedSymmetricEss;
 import io.openems.edge.meter.api.AsymmetricMeter;
 import io.openems.edge.meter.api.MeterType;

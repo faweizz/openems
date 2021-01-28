@@ -62,6 +62,12 @@ public class MyConfig extends AbstractComponentConfig implements Config {
 		return null;
 	}
 
+	@Override
+	public String deviceId() {
+		// TODO Auto-generated method stub
+		return null;
+	}
+
 //	@Override
 //	public String setting0() {
 //		return this.builder.setting0;

@@ -29,4 +29,7 @@ import io.openems.edge.meter.api.MeterType;
 	
 	@AttributeDefinition(name = "TTN app key", description = "Application key of the ttn network")
 	String appKey() default "";
+	
+	@AttributeDefinition(name = "Device id", description = "Device id to listen to")
+	String deviceId() default "";
 }
