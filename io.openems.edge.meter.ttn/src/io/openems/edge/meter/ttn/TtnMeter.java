@@ -88,15 +88,8 @@ public class TtnMeter extends AbstractOpenemsComponent implements OpenemsCompone
 						TtnMessage parsedMessage = new Gson().fromJson(value, TtnMessage.class);
 						byte[] decoded = Base64.getDecoder().decode(parsedMessage.getPayload_raw());
 
-						StringBuffer buffer = new StringBuffer();
-
-						for (int i = 0; i < decoded.length; i++) {
-							byte beit = decoded[i];
-							String string = Integer.toHexString(Byte.toUnsignedInt(beit));
-							buffer.append(string);
-						}
-
-						currentValue = Integer.parseInt(buffer.toString(), 16);
+					
+						currentValue = Integer.parseInt(new String(decoded));
 					} catch (Exception e) {
 						e.printStackTrace();
 					}
